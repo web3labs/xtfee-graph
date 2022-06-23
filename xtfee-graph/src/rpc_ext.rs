@@ -13,6 +13,15 @@ pub enum NumberOrHex {
     Hex(U256),
 }
 
+impl NumberOrHex {
+    pub fn as_u128(&self) -> u128 {
+        match self {
+            NumberOrHex::Number(number) => *number as u128,
+            NumberOrHex::Hex(hex) => hex.as_u128(),
+        }
+    }
+}
+
 impl Default for NumberOrHex {
     fn default() -> Self {
         Self::Number(Default::default())

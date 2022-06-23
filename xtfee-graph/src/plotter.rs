@@ -42,18 +42,15 @@ pub fn plot(blocks: Vec<Block>, output_path: String) -> Result<(), Box<dyn std::
     let mut data = Vec::<u128>::new();
     blocks_with_extrinsics.iter().for_each(|block| {
         block.extrinsics.iter().for_each(|xtr| {
-            match xtr
-                .fee_details
-                .inclusion_fee
-                .as_ref()
-                .unwrap()
-                .adjusted_weight_fee
-            {
-                NumberOrHex::Number(number) => {
-                    data.push(number as u128);
-                }
-                NumberOrHex::Hex(hex) => data.push(hex.as_u128()),
-            }
+            let mut final_value = 0;
+
+            let inclusion_fee = xtr.fee_details.inclusion_fee.as_ref().unwrap();
+
+            final_value += inclusion_fee.base_fee.as_u128();
+            final_value += inclusion_fee.len_fee.as_u128();
+            final_value += inclusion_fee.adjusted_weight_fee.as_u128();
+
+            data.push(final_value)
         })
     });
 
@@ -71,7 +68,7 @@ pub fn draw(data: Vec<u128>, output_path: String) -> Result<(), Box<dyn std::err
         .caption("Fee Observations", ("sans-serif", 50).into_font())
         .margin(5)
         .x_label_area_size(50)
-        .y_label_area_size(120)
+        .y_label_area_size(150)
         .build_cartesian_2d(0..data_len, data_min..data_max)?;
 
     chart
