@@ -65,16 +65,21 @@ pub fn draw(data: Vec<u128>, output_path: String) -> Result<(), Box<dyn std::err
     let data_max = *data.iter().max().unwrap_or(&0u128);
     let data_min = *data.iter().min().unwrap_or(&0u128);
 
-    let root = BitMapBackend::new(&output_path, (640, 480)).into_drawing_area();
+    let root = BitMapBackend::new(&output_path, (960, 640)).into_drawing_area();
     root.fill(&WHITE)?;
     let mut chart = ChartBuilder::on(&root)
         .caption("Fee Observations", ("sans-serif", 50).into_font())
         .margin(5)
-        .x_label_area_size(120)
+        .x_label_area_size(50)
         .y_label_area_size(120)
         .build_cartesian_2d(0..data_len, data_min..data_max)?;
 
-    chart.configure_mesh().draw()?;
+    chart
+        .configure_mesh()
+        .x_desc("Transactions")
+        .y_desc("Fees")
+        .axis_desc_style(("sans-serif", 30).into_font())
+        .draw()?;
 
     chart
         .draw_series(LineSeries::new(
